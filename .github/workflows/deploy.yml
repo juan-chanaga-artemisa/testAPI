@@ -1,0 +1,28 @@
+name: Deploy API to WSO2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up APICTL
+        run: |
+          wget https://github.com/wso2/product-apim-tooling/releases/download/v4.1.0/apictl-4.1.0-linux-x64.tar.gz
+          tar -xvzf apictl-4.1.0-linux-x64.tar.gz
+          sudo mv apictl /usr/local/bin/
+
+      - name: Login to WSO2
+        run: |
+          apictl login https://localhost:9443 -u ${{ secrets.WSO2_USERNAME }} -p ${{ secrets.WSO2_PASSWORD }} -k
+
+      - name: Deploy API
+        run: |
+          apictl import-api -f C:\Users\JuanP\.wso2apictl\exported\apis\local\TestAPI_1.zip -e local -k
